@@ -16,90 +16,127 @@ namespace FocusStartTest_iOSdev
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("АВТОМОБИЛЬНЫЙ СПРАВОЧНИК 1.0 \n" +
-                              "МЕНЮ: \n" +
-                              "1 - Просмотреть информацию об автомобилях \n" +
+                              "ГЛАВНОЕ МЕНЮ: \n" +
+                              "1 - Редактировать информацию об автомобилях \n" +
                               "2 - Добавить новый автомобиль \n" +
                               "3 - Удалить автомобиль \n" +
                               "4 - Выход \n");
 
-            string command = Console.ReadLine();
+            string command = "";
 
             try
             {
-                if (command == "1") // Просмотр информации об автомобилях
+                Console.WriteLine("Информация об автомобилях:");
+
+                using (StreamReader carName = new StreamReader("carName.txt"))
                 {
-                    Console.WriteLine("Информация об автомобилях:");
+                    String autoName = "";
+                    String autoInfo = "";
+                    int count = File.ReadAllLines("carName.txt").Length;
 
-                    using (StreamReader carName = new StreamReader("carName.txt"))
+                    using (StreamReader carInfo = new StreamReader("carInfo.txt"))
                     {
-                        String autoName = "";
-                        String autoInfo = "";
-                        int count = File.ReadAllLines("carName.txt").Length;
-
-                        using (StreamReader carInfo = new StreamReader("carInfo.txt"))
+                        for (int n = 1; n <= count; n++)
                         {
-                            for (int n = 1; n <= count; n++)
-                            {
                                 autoName = carName.ReadLine();
                                 autoInfo = carInfo.ReadLine();
                                 Console.WriteLine(n + ". " + autoName + ": " + autoInfo);
-                            }
                         }
-                        Console.WriteLine();
-                        Console.WriteLine("Редактировать информацию об автомобиле или выйти в главное меню? (r/e)");
-                        command = Console.ReadLine();
+                    }                  
+                }
 
-                        if (command == "r") // Редактирование информации выбранного автомобиля
-                        {
-                            Console.WriteLine("Напишите номер автомобиля");
-                            command = Console.ReadLine();
-                            string[] lines = File.ReadAllLines("carInfo.txt");
-                            string line = lines[Convert.ToInt32(command) - 1];
-                            Console.WriteLine(line);
+                Console.WriteLine();
+                Console.WriteLine("Выберите действие (1-4):");
+                command = Console.ReadLine();
 
-                            Console.WriteLine("Напишите новую информацию для выбранного автомобиля");                           
-                            string newInfo = Console.ReadLine();
+                if (command == "1") // Редактирование информации выбранного автомобиля
+                {
+                    Console.WriteLine("Введите номер автомобиля");
+                    command = Console.ReadLine();
+                    string[] linesCarInfo = File.ReadAllLines("carInfo.txt");
+                    string lineCarInfo = linesCarInfo[Convert.ToInt32(command) - 1];
+                    Console.WriteLine(lineCarInfo);
 
-                            string str = string.Empty;
-                            using (StreamReader reader = File.OpenText("carInfo.txt"))
-                            {
-                                str = reader.ReadToEnd();
-                            }
-                            str = str.Replace(line, newInfo);
+                    Console.WriteLine("Введите новую информацию для выбранного автомобиля");
+                    string newInfo = Console.ReadLine();
 
-                            using (StreamWriter file = new StreamWriter("carInfo.txt"))
-                            {
-                                file.Write(str);
-                            }
-
-                            Console.WriteLine("Запись успешно отредактирована. Возвращение в Главное меню");
-                            Process.Start(Assembly.GetExecutingAssembly().Location);
-                            Environment.Exit(0);
-                        }
-
-                        else if (command == "e") // Запуск главного меню
-                        {
-                            Process.Start(Assembly.GetExecutingAssembly().Location);
-                            Environment.Exit(0);
-                        }
-
-                        else
-                        {
-                            Console.WriteLine("Ошибка. Приложение закрывается. Нажмите любую клавишу");
-                            Console.ReadKey();
-                            Environment.Exit(0);
-                        }
+                    string str = string.Empty;
+                    using (StreamReader reader = File.OpenText("carInfo.txt"))
+                    {
+                        str = reader.ReadToEnd();
                     }
+                    str = str.Replace(lineCarInfo, newInfo);
+
+                    using (StreamWriter file = new StreamWriter("carInfo.txt"))
+                    {
+                        file.Write(str);
+                    }
+
+                    Console.WriteLine("Запись успешно отредактирована. Возвращение в Главное меню. Нажмите любую клавишу");
+                    Console.ReadKey();
+                    Process.Start(Assembly.GetExecutingAssembly().Location);
+                    Environment.Exit(0);
                 }
 
-                else if (command == "2") // Добавление нового автомобиля
+                else if (command == "2") // Добавление нового автомобиля 
                 {
-                    Console.WriteLine("ДЕЙСТВИЕ ДВА");
+                    Console.WriteLine("Введите название нового автомобиля");
+                    string newAutoName = Console.ReadLine();
+
+                    StreamWriter writerName = new StreamWriter("carName.txt", true);
+                    writerName.WriteLine(newAutoName);
+                    writerName.Close();
+
+                    Console.WriteLine("Введите информацию о новом автомобиле");
+                    string newAutoInfo = Console.ReadLine();
+
+                    StreamWriter writerInfo = new StreamWriter("carInfo.txt", true);
+                    writerInfo.WriteLine(newAutoInfo);
+                    writerInfo.Close();
+
+                    Console.WriteLine("Новая запись успешно добавлена. Переход в главное меню. Нажмите любую клавишу");
+                    Console.ReadKey();
+
+                    Process.Start(Assembly.GetExecutingAssembly().Location);
+                    Environment.Exit(0);
                 }
 
-                else if (command == "3")
+                else if (command == "3") // Удаление записи
                 {
-                    Console.WriteLine("ДЕЙСТВИЕ ТРИ");
+                    Console.WriteLine("Введите номер автомобиля");
+                    command = Console.ReadLine();
+                    string[] linesCarName = File.ReadAllLines("carName.txt");
+                    string[] linesCarInfo = File.ReadAllLines("carInfo.txt");
+                    string lineCarName = linesCarName[Convert.ToInt32(command) - 1];
+                    string lineCarInfo = linesCarInfo[Convert.ToInt32(command) - 1];
+                    Console.WriteLine(lineCarName + ": " + lineCarInfo);
+
+                    Console.WriteLine("Удалить выбранную запись? (y/n)");
+                    command = Console.ReadLine();
+
+                    if (command == "y")
+                    {
+                        string[] carNames = File.ReadAllLines("carName.txt");
+                        string[] carInfo = File.ReadAllLines("carInfo.txt");
+
+                        int indexAutoDelete = Convert.ToInt32(command);
+
+                        carNames[indexAutoDelete] = String.Empty; // deleting
+                        File.WriteAllLines("carName.txt", carNames);
+
+                        carInfo[indexAutoDelete] = String.Empty;
+                        File.WriteAllLines("carInfo.txt", carInfo);
+
+                        //Console.WriteLine("Запись успешно отредактирована. Возвращение в Главное меню. Нажмите любую клавишу");
+                        //Console.ReadKey();
+                        //Process.Start(Assembly.GetExecutingAssembly().Location);
+                        //Environment.Exit(0);
+                    }
+
+                    else
+                    {
+                        Console.WriteLine("fail");
+                    }
                 }
 
                 else if (command == "4") // Выход
@@ -110,7 +147,7 @@ namespace FocusStartTest_iOSdev
                     {
                         Environment.Exit(0);
                     }
-                    
+
                     else if (exitAnswer == "n") // Нет
                     {
                         Process.Start(Assembly.GetExecutingAssembly().Location);
@@ -119,16 +156,11 @@ namespace FocusStartTest_iOSdev
 
                     else // Ошибка. Перезапуск. Главное меню
                     {
-                        Console.WriteLine("Некорректно");
+                        Console.WriteLine("Некорректно. Переход в главное меню");
                         Console.ReadKey();
                         Process.Start(Assembly.GetExecutingAssembly().Location);
                         Environment.Exit(0);
                     }
-                }
-
-                else
-                {
-                    Console.WriteLine("ОШИБКА");
                 }
 
             }
@@ -136,8 +168,7 @@ namespace FocusStartTest_iOSdev
             catch (Exception e)
             {
                 Console.WriteLine("{0} Exception caught.", e);
-            }
-               
+            }            
         }
     }
 }
