@@ -20,14 +20,13 @@ namespace FocusStartTest_iOSdev
                               "1 - Просмотреть информацию об автомобилях \n" +
                               "2 - Добавить новый автомобиль \n" +
                               "3 - Удалить автомобиль \n" +
-                              "4 - Редактировать информацию об автомобиле \n" +
-                              "5 - Выход \n");
+                              "4 - Выход \n");
 
             string command = Console.ReadLine();
 
             try
             {
-                if (command == "1")
+                if (command == "1") // Просмотр информации об автомобилях
                 {
                     Console.WriteLine("Информация об автомобилях:");
 
@@ -35,7 +34,7 @@ namespace FocusStartTest_iOSdev
                     {
                         String autoName = "";
                         String autoInfo = "";
-                        int count = System.IO.File.ReadAllLines("carName.txt").Length;
+                        int count = File.ReadAllLines("carName.txt").Length;
 
                         using (StreamReader carInfo = new StreamReader("carInfo.txt"))
                         {
@@ -50,15 +49,35 @@ namespace FocusStartTest_iOSdev
                         Console.WriteLine("Редактировать информацию об автомобиле или выйти в главное меню? (r/e)");
                         command = Console.ReadLine();
 
-                        if (command == "r")
+                        if (command == "r") // Редактирование информации выбранного автомобиля
                         {
                             Console.WriteLine("Напишите номер автомобиля");
                             command = Console.ReadLine();
+                            string[] lines = File.ReadAllLines("carInfo.txt");
+                            string line = lines[Convert.ToInt32(command) - 1];
+                            Console.WriteLine(line);
 
+                            Console.WriteLine("Напишите новую информацию для выбранного автомобиля");                           
+                            string newInfo = Console.ReadLine();
 
+                            string str = string.Empty;
+                            using (StreamReader reader = File.OpenText("carInfo.txt"))
+                            {
+                                str = reader.ReadToEnd();
+                            }
+                            str = str.Replace(line, newInfo);
+
+                            using (StreamWriter file = new StreamWriter("carInfo.txt"))
+                            {
+                                file.Write(str);
+                            }
+
+                            Console.WriteLine("Запись успешно отредактирована. Возвращение в Главное меню");
+                            Process.Start(Assembly.GetExecutingAssembly().Location);
+                            Environment.Exit(0);
                         }
 
-                        else if (command == "e")
+                        else if (command == "e") // Запуск главного меню
                         {
                             Process.Start(Assembly.GetExecutingAssembly().Location);
                             Environment.Exit(0);
@@ -73,7 +92,7 @@ namespace FocusStartTest_iOSdev
                     }
                 }
 
-                else if (command == "2")
+                else if (command == "2") // Добавление нового автомобиля
                 {
                     Console.WriteLine("ДЕЙСТВИЕ ДВА");
                 }
@@ -83,12 +102,7 @@ namespace FocusStartTest_iOSdev
                     Console.WriteLine("ДЕЙСТВИЕ ТРИ");
                 }
 
-                else if (command == "4")
-                {
-                    Console.WriteLine("ДЕЙСТВИЕ ЧЕТЫРЕ");
-                }
-
-                else if (command == "5") // Выход
+                else if (command == "4") // Выход
                 {
                     Console.WriteLine("Выйти? (y/n)");
                     string exitAnswer = Console.ReadLine();
