@@ -105,10 +105,11 @@ namespace FocusStartTest_iOSdev
                 {
                     Console.WriteLine("Введите номер автомобиля");
                     command = Console.ReadLine();
+                    int line_to_delete = Convert.ToInt32(command) - 1;
                     string[] linesCarName = File.ReadAllLines("carName.txt");
                     string[] linesCarInfo = File.ReadAllLines("carInfo.txt");
-                    string lineCarName = linesCarName[Convert.ToInt32(command) - 1];
-                    string lineCarInfo = linesCarInfo[Convert.ToInt32(command) - 1];
+                    string lineCarName = linesCarName[line_to_delete];
+                    string lineCarInfo = linesCarInfo[line_to_delete];
                     Console.WriteLine(lineCarName + ": " + lineCarInfo);
 
                     Console.WriteLine("Удалить выбранную запись? (y/n)");
@@ -116,26 +117,56 @@ namespace FocusStartTest_iOSdev
 
                     if (command == "y")
                     {
-                        string[] carNames = File.ReadAllLines("carName.txt");
-                        string[] carInfo = File.ReadAllLines("carInfo.txt");
+                        string tempFile = Path.GetTempFileName();
 
-                        int indexAutoDelete = Convert.ToInt32(command);
+                        using (var sr = new StreamReader("carName.txt"))
+                        using (var sw = new StreamWriter(tempFile))
+                        {
+                            string line;
 
-                        carNames[indexAutoDelete] = String.Empty; // deleting
-                        File.WriteAllLines("carName.txt", carNames);
+                            while ((line = sr.ReadLine()) != null)
+                            {
+                                if (line != lineCarName)
+                                    sw.WriteLine(line);
+                            }
+                        }
 
-                        carInfo[indexAutoDelete] = String.Empty;
-                        File.WriteAllLines("carInfo.txt", carInfo);
+                        File.Delete("carName.txt");
+                        File.Move(tempFile, "carName.txt");
 
-                        //Console.WriteLine("Запись успешно отредактирована. Возвращение в Главное меню. Нажмите любую клавишу");
-                        //Console.ReadKey();
-                        //Process.Start(Assembly.GetExecutingAssembly().Location);
-                        //Environment.Exit(0);
+                        using (var sr = new StreamReader("carInfo.txt"))
+                        using (var sw = new StreamWriter(tempFile))
+                        {
+                            string line;
+
+                            while ((line = sr.ReadLine()) != null)
+                            {
+                                if (line != lineCarInfo)
+                                    sw.WriteLine(line);
+                            }
+                        }
+
+                        File.Delete("carInfo.txt");
+                        File.Move(tempFile, "carInfo.txt");
+
+                        Console.WriteLine("Запись успешно удалена. Возвращение в Главное меню. Нажмите любую клавишу");
+                        Console.ReadKey();
+                        Process.Start(Assembly.GetExecutingAssembly().Location);
+                        Environment.Exit(0);
                     }
 
-                    else
+                    else if (command == "n") // Нет
                     {
-                        Console.WriteLine("fail");
+                        Process.Start(Assembly.GetExecutingAssembly().Location);
+                        Environment.Exit(0);
+                    }
+
+                    else // Ошибка. Перезапуск. Главное меню
+                    {
+                        Console.WriteLine("Некорректно. Переход в главное меню");
+                        Console.ReadKey();
+                        Process.Start(Assembly.GetExecutingAssembly().Location);
+                        Environment.Exit(0);
                     }
                 }
 
